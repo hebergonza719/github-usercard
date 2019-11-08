@@ -24,7 +24,7 @@
           user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+const followersArray = ['tetondan', 'dustinmyers', 'justsml', 'luishrd', 'bigknell', 'K-JHarris'];
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
@@ -46,6 +46,66 @@ const followersArray = [];
 
 */
 
+const createCard = (receivedData) => {
+  const card = document.createElement('div');
+  const imgUser = document.createElement('img');
+  const cardInfo = document.createElement('div');
+  const h3Name = document.createElement('h3');
+  const pUsername = document.createElement('p');
+  const pLocation = document.createElement('p');
+  const pProfile = document.createElement('p');
+  const aTag = document.createElement('a');
+  const pFollowers = document.createElement('p');
+  const pFollowing = document.createElement('p');
+  const pBio = document.createElement('p');
+
+  // I had to place it here, otherwise (pProfile.textContent = 'Profile: ';) would have overridden what's in the a tag.
+  imgUser.src = receivedData.avatar_url;
+  h3Name.textContent = receivedData.name;
+  pUsername.textContent = receivedData.login;
+  pLocation.textContent = `Location: ${receivedData.location}`;
+  pProfile.textContent = 'Profile: ';
+  aTag.href = receivedData.html_url;
+  aTag.textContent = receivedData.html_url;
+  pFollowers.textContent = `Followers: ${receivedData.followers.toString()}`;
+  pFollowing.textContent = `Following: ${receivedData.following.toString()}`;
+  pBio.textContent = `Bio: ${receivedData.bio}`;
+
+  card.appendChild(imgUser);
+  card.appendChild(cardInfo);
+  cardInfo.appendChild(h3Name);
+  cardInfo.appendChild(pUsername);
+  cardInfo.appendChild(pLocation);
+  cardInfo.appendChild(pProfile);
+  pProfile.appendChild(aTag);
+  cardInfo.appendChild(pFollowers);
+  cardInfo.appendChild(pFollowing);
+  cardInfo.appendChild(pBio);
+  
+  card.classList.add('card');
+  cardInfo.classList.add('card-info');
+  h3Name.classList.add('name');
+  pUsername.classList.add('username');
+
+  return card;
+}
+
+const cardsElement = document.querySelector('.cards');
+
+const axiosPromise = axios.get("https://api.github.com/users/hebergonza719");
+console.log(axiosPromise);
+
+axiosPromise.then(response => {
+  console.log(response.data);
+  const receivedData = response.data;
+  console.log(receivedData);
+  cardsElement.appendChild(createCard(receivedData)); // must be created in .then
+});
+
+axiosPromise.catch(error => {
+  console.log('The data was not returned', error);
+});
+
 /* List of LS Instructors Github username's: 
   tetondan
   dustinmyers
@@ -53,3 +113,12 @@ const followersArray = [];
   luishrd
   bigknell
 */
+
+followersArray.forEach((follower) => {
+  axios
+  .get(`https://api.github.com/users/${follower}`) // no semi-colon
+  .then(response => {
+    receivedData = response.data;
+    cardsElement.appendChild(createCard(receivedData));
+  })
+});
